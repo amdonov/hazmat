@@ -1,5 +1,6 @@
 package com.bah.hazmattransfer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,22 +31,39 @@ public class GeneratorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NfcAdapter.CreateNdefMessageCallback {
 
     NfcAdapter mNfcAdapter;
-    EditText transporterId;
+    MessageType messageType;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_generator);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final Activity test = this;
+        Button button = (Button) findViewById(R.id.sendGenerator);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                messageType = MessageType.generator;
+                mNfcAdapter.invokeBeam(test);
+            }
+        });
+        button = (Button) findViewById(R.id.sendTransporter);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                messageType = MessageType.transporter;
+                mNfcAdapter.invokeBeam(test);
             }
         });
 
@@ -57,13 +77,6 @@ public class GeneratorActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        // Check for available NFC Adapter
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mNfcAdapter == null) {
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
         // Register callback
         mNfcAdapter.setNdefPushMessageCallback(this, this);
     }
@@ -125,12 +138,29 @@ public class GeneratorActivity extends AppCompatActivity
         return true;
     }
 
+    private String getGeneratorData() {
+        EditText textBox = (EditText) findViewById(R.id.editText);
+        return String.format("generator:%s",textBox.getText());
+    }
+
+    private String getTransporterData() {
+        EditText textBox = (EditText) findViewById(R.id.transporterID);
+        return String.format("transporter:%s",textBox.getText());
+    }
+
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        String text = ("Beam me up, Android!\n\n" +
-                "Beam Time: " + System.currentTimeMillis());
+        Log.w("test", "Message sent");
+        String text;
+        switch (messageType) {
+            case generator:
+                text = getGeneratorData();
+                break;
+            default:
+                text = getTransporterData();
+        }
         NdefMessage msg = new NdefMessage(
-                new NdefRecord[] { createMimeRecord(
+                new NdefRecord[]{createMimeRecord(
                         "application/com.bah.hazmattransfer", text.getBytes())
                         /**
                          * The Android Application Record (AAR) is commented out. When a device
@@ -142,7 +172,10 @@ public class GeneratorActivity extends AppCompatActivity
                         */
                         //,NdefRecord.createApplicationRecord("com.example.android.beam")
                 });
+
         return msg;
+
+
     }
 
     /**
@@ -158,7 +191,6 @@ public class GeneratorActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -167,21 +199,28 @@ public class GeneratorActivity extends AppCompatActivity
             processIntent(getIntent());
         }
     }
+
     @Override
     public void onNewIntent(Intent intent) {
         // onResume gets called after this to handle the intent
         setIntent(intent);
     }
+
     /**
      * Parses the NDEF Message from the intent and prints to the TextView
      */
     void processIntent(Intent intent) {
-        transporterId = (EditText) findViewById(R.id.transporterID);
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
                 NfcAdapter.EXTRA_NDEF_MESSAGES);
         // only one message sent during the beam
         NdefMessage msg = (NdefMessage) rawMsgs[0];
-        // record 0 contains the MIME type, record 1 is the AAR, if present
-        transporterId.setText(new String(msg.getRecords()[0].getPayload()));
+        String message = new String(msg.getRecords()[0].getPayload());
+        EditText textBox;
+        if (message.startsWith("generator")) {
+            textBox = (EditText) findViewById(R.id.editText);
+        } else {
+            textBox = (EditText) findViewById(R.id.transporterID);
+        }
+        textBox.setText(message.substring(message.indexOf(':')+1));
     }
 }

@@ -54,4 +54,20 @@
         android:layout_alignTop="@+id/transporterID"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Generator Info"
+        android:id="@+id/sendGenerator"
+        android:layout_above="@+id/sendTransporter"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Transporter INFO"
+        android:id="@+id/sendTransporter"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
