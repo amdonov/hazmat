@@ -217,9 +217,9 @@ public class GeneratorActivity extends AppCompatActivity
         String message = new String(msg.getRecords()[0].getPayload());
         EditText textBox;
         if (message.startsWith("generator")) {
-            textBox = (EditText) findViewById(R.id.editText);
+            textBox = (EditText) findViewById(R.id.generatorETTran);
         } else {
-            textBox = (EditText) findViewById(R.id.transporterID);
+            textBox = (EditText) findViewById(R.id.transporterIdGen);
         }
         textBox.setText(message.substring(message.indexOf(':')+1));
     }
