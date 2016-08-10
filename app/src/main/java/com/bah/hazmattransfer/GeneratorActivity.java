@@ -219,13 +219,15 @@ public class GeneratorActivity extends AppCompatActivity
         EditText textBox;
         if (message.startsWith("generator")) {
             textBox = (EditText) findViewById(R.id.generatorETTran);
+
+            textBox.setText(message.substring(message.indexOf(':')+1));
         } else {
 
             textBox = (EditText) findViewById(R.id.transporterIdGen);
+            textBox.setText(message.substring(message.indexOf(':')+1));
             // TODO this should check data first
             sendEmail();
         }
-        textBox.setText(message.substring(message.indexOf(':')+1));
     }
 
 
