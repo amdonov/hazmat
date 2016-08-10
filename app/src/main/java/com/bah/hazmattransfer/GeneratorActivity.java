@@ -149,6 +149,11 @@ public class GeneratorActivity extends AppCompatActivity
         return String.format("transporter:%s",textBox.getText());
     }
 
+    private String getTransporterData2() {
+        EditText textBox = (EditText) findViewById(R.id.transporterIdGen);
+        return String.format("transporter:%s",textBox.getText());
+    }
+
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         Log.w("test", "Message sent");
@@ -225,6 +230,8 @@ public class GeneratorActivity extends AppCompatActivity
 
             textBox = (EditText) findViewById(R.id.transporterIdGen);
             textBox.setText(message.substring(message.indexOf(':')+1));
+            textBox = (EditText) findViewById(R.id.transporterIdGen);
+            textBox.setText(message.substring(message.indexOf(':')+1));
             // TODO this should check data first
             sendEmail();
         }
@@ -242,7 +249,7 @@ public class GeneratorActivity extends AppCompatActivity
         emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
         emailIntent.putExtra(Intent.EXTRA_CC, CC);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hazmat Transfer");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s\r\n%s",getGeneratorData(),getTransporterData()));
+        emailIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s\r\n%s",getGeneratorData(),getTransporterData2()));
 
         try {
             startActivity(Intent.createChooser(emailIntent, "Send mail..."));
