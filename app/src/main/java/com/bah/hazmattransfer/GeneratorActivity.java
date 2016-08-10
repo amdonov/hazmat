@@ -2,6 +2,7 @@ package com.bah.hazmattransfer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -220,7 +221,33 @@ public class GeneratorActivity extends AppCompatActivity
             textBox = (EditText) findViewById(R.id.editText);
         } else {
             textBox = (EditText) findViewById(R.id.transporterID);
+            // TODO this should check data first
+            sendEmail();
         }
         textBox.setText(message.substring(message.indexOf(':')+1));
+    }
+
+
+    private void sendEmail() {
+        Log.i("hazmat", "Send email");
+        String[] TO = {"donovan_aaron@bah.com"};
+        String[] CC = {""};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+        emailIntent.putExtra(Intent.EXTRA_CC, CC);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hazmat Transfer");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s\r\n%s",getGeneratorData(),getTransporterData()));
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            finish();
+            Log.i("hazmat", "Finished sending email...");
+        }
+        catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(GeneratorActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
