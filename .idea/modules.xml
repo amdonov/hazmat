@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HazmatTransfer.iml" filepath="$PROJECT_DIR$/HazmatTransfer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hazmat.iml" filepath="$PROJECT_DIR$/hazmat.iml" />
     </modules>
   </component>
 </project>
